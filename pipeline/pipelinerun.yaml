@@ -24,7 +24,7 @@ spec:
   - name: repo-url
     value: https://github.com/unixunion/simple-server-k8s-test.git
   - name: revision
-    value: master
+    value: main
   - name: image-reference
     value: registry.unixunion.org/sandbox/simple-server:dev
   - name: dockerfile
