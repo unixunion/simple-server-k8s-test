@@ -1,0 +1,21 @@
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: simple-server
+  namespace: argo-cd
+spec:
+  project: default
+
+  source:
+    repoURL: https://github.com/unixunion/simple-server-k8s-test.git
+    targetRevision: HEAD
+    path: charts/simple-server
+
+  destination:
+    server: https://kubernetes.default.svc
+    namespace: simple-server
+
+  syncPolicy:
+    automated:
+      prune: true
+      selfHeal: true

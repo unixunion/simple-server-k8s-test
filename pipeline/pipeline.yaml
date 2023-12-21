@@ -1,0 +1,52 @@
+apiVersion: tekton.dev/v1beta1
+kind: Pipeline
+metadata:
+  name: python-build-containerize
+spec:
+  description: | 
+    This pipeline builds a python app and then dockerizes it
+  params:
+  - name: repo-url
+    type: string
+    description: The git repo URL to clone from.
+  - name: revision
+    type: string
+    description: The tag/branch/revision
+  - name: image-reference
+    type: string
+  - name: dockerfile
+    type: string
+    default: ./Dockerfile
+  workspaces:
+  - name: shared-data
+    description: | 
+      This workspace contains the cloned repo files, so they can be read by the
+      next task.
+  - name: git-credentials
+    description: My ssh credentials
+  tasks:
+  - name: fetch-source
+    taskRef:
+      name: git-clone
+    workspaces:
+    - name: output
+      workspace: shared-data
+    - name: ssh-directory
+      workspace: git-credentials
+    params:
+    - name: url
+      value: $(params.repo-url)
+    - name: revision
+      value: $(params.revision)
+  - name: build-push
+    runAfter: ["git-clone"]
+    taskRef:
+      name: kaniko
+    workspaces:
+    - name: source
+      workspace: shared-data
+    params:
+    - name: IMAGE
+      value: $(params.image-reference)
+    - name: DOCKERFILE
+      value: $(params.dockerfile)
